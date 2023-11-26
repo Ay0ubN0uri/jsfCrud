@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="jakarta.faces.core">
+    <h:head>
+        <title>Facelet Title</title>
+        <h:outputStylesheet library="webjars" name="primeflex/3.3.1/primeflex.min.css" />
+    </h:head>
+    <h:body>
+        <div class="card" style="margin-bottom: 20px;">
+            <h:form>
+                <p:growl id="messages"/>
+
+                <p:menubar>
+                    <f:facet name="options" >
+                        <div class="flex flex-row align-items-center justify-content-start">
+                            <p:badge value="welcome #{login.user.username}" styleClass="mr-3" size="large" severity="info"></p:badge>
+                            <p:commandButton value="Logout" styleClass="mr-3" action="#{login.logout}" />
+                            <img src="http://localhost:8080/jsf/assets/img.svg" alt="Your Image" style="width: 50px; height: 50px; margin-right: 10px;"/>
+                        </div>
+                    </f:facet>
+                    <p:menuitem value="Home" icon="pi pi-fw pi-home" outcome="index.xhtml" />
+                    <p:menuitem value="Employees" icon="pi pi-fw pi-user" outcome="/web/employe.xhtml" />
+                    <p:menuitem value="Services" icon="pi pi-fw pi-calendar" outcome="/web/service.xhtml"/>
+
+                </p:menubar>
+            </h:form>
+        </div>
+
+
+        <p:panel header="Statistiques" style="margin: 10px;">
+            <p:panelGrid columns="2">
+                <h:form id="form" style="width: 700px;">
+                    <p:treeTable id="docs" value="#{ttContextMenuView.root}" var="emp" selectionMode="single"
+                                 selection="#{ttContextMenuView.selectedNode}">
+                        <f:facet name="header">
+                            Employees Viewer
+                        </f:facet>
+                        <p:column headerText="Name">
+                            <h:outputText value="#{emp.nom}"/>
+                        </p:column>
+                    </p:treeTable>
+                </h:form>
+                <p:barChart model="#{employeBean.barModel}" style="width: 100%; height: 500px;"/>
+            </p:panelGrid>
+        </p:panel>
+
+        <p:panel style="margin-top:10px;" footer="Crud app using jakarta 10 - hibernate - jsf - primefaces v13">
+            <h:outputText value="© 2023 By A00N" />
+        </p:panel>
+    </h:body>
+</html>

@@ -1,0 +1,27 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:head>
+    </h:head>
+
+    <h:body>
+        <div class="card">
+            <p:growl id="messages" showDetail="true"/>
+            <h:form enctype="multipart/form-data">
+                <div class="field" style="margin-bottom: 10px;">
+                    <p:outputLabel for="prenom">Prenom</p:outputLabel>
+                    <p:inputText id="prenom" value="#{employeBean.selectedEmploye.prenom}" required="true" />
+                </div>
+                <div class="field" style="margin-bottom: 10px;">
+                    <p:fileUpload value="#{employeBean.file}" mode="simple" skinSimple="true"/>
+                </div>
+
+                <p:commandButton value="Submit" ajax="false" action="#{employeBean.upload}" styleClass="mt-3 ui-button-outlined block"/>
+            </h:form>
+            <p:outputLabel value="#{employeBean.file.fileName}" rendered="#{not empty employeBean.file}"/>
+            <p:graphicImage id="a00n" value="#{employeBean.file.content}" rendered="#{not empty employeBean.file}" alt="#{employeBean.file.fileName}" width="70px" height="70px" />
+        </div>
+    </h:body>
+</html>

@@ -1,0 +1,139 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="jakarta.faces.core">
+    <h:head>
+        <title>Service</title>
+    </h:head>
+    <h:body>
+        <div class="card" style="margin-bottom: 20px;">
+            <h:form>
+                <p:growl id="messages"/>
+
+                <p:menubar>
+                    <f:facet name="options">
+                        <img src="http://localhost:8080/jsf/assets/img.svg" alt="Your Image" style="width: 50px; height: 50px; margin-right: 10px;"/>
+                    </f:facet>
+                    <p:menuitem value="Home" icon="pi pi-fw pi-home" outcome="/index.xhtml" />
+                    <p:menuitem value="Employees" icon="pi pi-fw pi-user" outcome="/web/employe.xhtml" />
+                    <p:menuitem value="Services" icon="pi pi-fw pi-calendar" outcome="/web/service.xhtml"/>
+
+                </p:menubar>
+            </h:form>
+        </div>
+
+        <div style="margin: 10px;">
+            <div class="card crud-demo">
+                <h:form id="form">
+                    <p:growl id="messages" showDetail="true" />
+
+                    <p:toolbar>
+                        <p:toolbarGroup>
+                            <p:commandButton value="New" icon="pi pi-plus" actionListener="#{serviceBean.openNew}"
+                                             update=":dialogs:manage-service-content" oncomplete="PF('manageServiceDialog').show()"
+                                             styleClass="ui-button-success" style="margin-right: .5rem">
+                                <p:resetInput target=":dialogs:manage-service-content" />
+                            </p:commandButton>
+                            <p:commandButton id="delete-services-button" value="#{serviceBean.deleteButtonMessage}"
+                                             icon="pi pi-trash" actionListener="#{serviceBean.deleteSelectedServices}"
+                                             styleClass="ui-button-danger" disabled="#{!serviceBean.hasSelectedServices()}" update="@this">
+                                <p:confirm header="Confirmation" message="Delete the selected services?"
+                                           icon="pi pi-exclamation-triangle" />
+                            </p:commandButton>
+                        </p:toolbarGroup>
+                        <p:toolbarGroup align="right">
+                            <!--<p:fileUpload mode="simple" skinSimple="true" label="Import" chooseIcon="pi pi-download" />-->
+                            <p:commandButton value="Export" icon="pi pi-upload" styleClass="ui-button-help" ajax="false">
+                                <p:dataExporter type="pdf" target="dt-services" fileName="services" />
+                            </p:commandButton>
+                        </p:toolbarGroup>
+                    </p:toolbar>
+
+                    <p:dataTable id="dt-services" widgetVar="dtServices" var="service" value="#{serviceBean.services}"
+                                 reflow="true" styleClass="services-table" selection="#{serviceBean.selectedServices}"
+                                 rowKey="#{service.id}" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
+                        <f:facet name="header">
+                            <div class="services-table-header">
+                                <span style="font-weight: bold">SERVICES</span>
+                                <span class="filter-container ui-input-icon-left"> <i class="pi pi-search"></i>
+                                    <p:inputText id="globalFilter" onkeyup="PF('dtServices').filter()" placeholder="Search" />
+                                </span>
+                            </div>
+                        </f:facet>
+
+                        <p:ajax event="rowSelect" update=":form:delete-services-button" />
+                        <p:ajax event="rowUnselect" update=":form:delete-services-button" />
+                        <p:ajax event="rowSelectCheckbox" update=":form:delete-services-button" />
+                        <p:ajax event="rowUnselectCheckbox" update=":form:delete-services-button" />
+                        <p:ajax event="toggleSelect" update=":form:delete-services-button" />
+
+                        <p:column selectionMode="multiple" exportable="false"></p:column>
+
+                        <p:column headerText="Id" sortBy="#{service.id}" filterBy="#{service.id}">
+                            <h:outputText value="#{service.id}" />
+                        </p:column>
+                        <p:column headerText="Nom" sortBy="#{service.nom}" filterBy="#{service.nom}">
+                            <h:outputText value="#{service.nom}" />
+                        </p:column>
+                        <p:column exportable="false">
+                            <p:commandButton icon="pi pi-pencil" update=":dialogs:manage-service-content"
+                                             oncomplete="PF('manageServiceDialog').show()"
+                                             styleClass="edit-button rounded-button ui-button-success" process="@this">
+                                <f:setPropertyActionListener value="#{service}" target="#{serviceBean.selectedService}" />
+                                <p:resetInput target=":dialogs:manage-service-content" />
+                            </p:commandButton>
+                            <p:commandButton class="ui-button-warning rounded-button" icon="pi pi-trash"
+                                             process="@this"
+                                             oncomplete="PF('deleteServiceDialog').show()">
+                                <f:setPropertyActionListener value="#{service}" target="#{serviceBean.selectedService}" />
+                            </p:commandButton>
+                        </p:column>
+
+                    </p:dataTable>
+                </h:form>
+
+                <h:form id="dialogs">
+                    <p:dialog header="Service Details" showEffect="fade" modal="true" widgetVar="manageServiceDialog"
+                              responsive="true">
+                        <p:outputPanel id="manage-service-content" class="ui-fluid">
+                            <p:outputPanel rendered="#{not empty serviceBean.selectedService}">
+                                <div class="field">
+                                    <p:outputLabel for="nom">Nom</p:outputLabel>
+                                    <p:inputText id="nom" value="#{serviceBean.selectedService.nom}" required="true" />
+                                </div>
+                            </p:outputPanel>
+                        </p:outputPanel>
+
+                        <f:facet name="footer">
+                            <p:commandButton value="Save" icon="pi pi-check" actionListener="#{serviceBean.saveService}"
+                                             update="manage-service-content" process="manage-service-content @this" />
+                            <p:commandButton value="Cancel" icon="pi pi-times" onclick="PF('manageServiceDialog').hide()"
+                                             class="ui-button-secondary" type="button" />
+                        </f:facet>
+                    </p:dialog>
+
+                    <p:confirmDialog widgetVar="deleteServiceDialog" showEffect="fade" width="300"
+                                     message="Delete the service?" header="Confirm" severity="warn">
+                        <p:commandButton value="Yes" icon="pi pi-check" actionListener="#{serviceBean.deleteService}"
+                                         process="@this" update=":form:delete-services-button"
+                                         oncomplete="PF('deleteServiceDialog').hide()" />
+                        <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
+                                         onclick="PF('deleteServiceDialog').hide()" />
+                    </p:confirmDialog>
+
+                    <p:confirmDialog global="true" showEffect="fade" width="300">
+                        <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-secondary"
+                                         icon="pi pi-times" />
+                    </p:confirmDialog>
+                </h:form>
+            </div>
+        </div>
+
+        <p:panel style="margin-top:10px;" footer="Crud app using jakarta 10 - hibernate - jsf - primefaces v13">
+            <h:outputText value="© 2023 By A00N" />
+        </p:panel>
+    </h:body>
+</html>
